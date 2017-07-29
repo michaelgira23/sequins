@@ -30,8 +30,9 @@
 			}
 
 			.chart-container {
-				width: 50%;
-				margin: 0 auto;
+				width: 80%;
+				max-width: 60rem;
+				margin: 5rem auto;
 				flex-grow: 1;
 				flex-shrink: 1;
 			}
@@ -52,19 +53,16 @@
 			<div class="editor-container"></div>
 		</div>
 
-		<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 		<script src="/node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 		<script>
-			var $editor = $('.editor-container');
+			var editorContainer = document.getElementsByClassName('editor-container')[0];
 			var editorOptions = {
 				mode: 'code',
 				indentation: 4,
 				onChange: parseEditorSequence
 			};
-			var editor = new JSONEditor($editor[0], editorOptions);
+			var editor = new JSONEditor(editorContainer, editorOptions);
 
 			editor.set([
 				{
@@ -117,8 +115,7 @@
 				[77, 83, 96]
 			];
 
-			var $chart = $('#chart');
-			var ctx = $chart[0].getContext('2d');
+			var ctx = document.getElementById('chart').getContext('2d');
 			var chart = new Chart(ctx, {
 				type: 'scatter',
 				data: {
@@ -154,8 +151,7 @@
 					datasets.push({
 						label: variableName,
 						data: [],
-						backgroundColor: 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', 0.5)',
-						// cubicInterpolationMode: 'monotone'
+						backgroundColor: 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', 0.5)'
 					});
 				}
 
