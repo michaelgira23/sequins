@@ -1,13 +1,13 @@
-import * as easings from './easings';
-
-export class Frame {
-
-	constructor(public values: FrameValues, public easeNext: (x: number) => number = easings.none) {
-
-	}
-
+export interface Frame {
+	time: number;
+	variables: FrameVariables;
 }
 
-export interface FrameValues {
-	[name: string]: number;
+export interface FrameVariables {
+	[name: string]: FrameVariable;
+}
+
+export interface FrameVariable {
+	value: number;
+	easeNext: (x: number) => number;
 }

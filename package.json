@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "A library for adding sequences of values and smoothly transitioning between them",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "tslint --type-check --project tsconfig.json \"src/**/*.ts\"",
     "prepublishOnly": "rimraf ./dist && npm run ts",
@@ -19,7 +20,8 @@
     "sequences",
     "timeframes",
     "frames",
-    "transitions"
+    "transitions",
+    "easings"
   ],
   "author": "Michael Gira",
   "license": "MIT",
@@ -28,6 +30,7 @@
   },
   "homepage": "https://github.com/michaelgira23/sequins#readme",
   "devDependencies": {
+    "rimraf": "^2.6.1",
     "tslint": "^5.5.0",
     "typescript": "^2.4.2"
   }

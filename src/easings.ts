@@ -1,4 +1,14 @@
-export
+/**
+ * Custom functions outside of the jQuery Easing plugin
+ */
+
+export function none(x: number) {
+	return x === 1 ? 1 : 0;
+}
+
+export function split(x: number) {
+	return x < 5 ? 0 : 1;
+}
 
 /**
  * jQuery Easing v1.3.1 - http://gsgd.co.uk/sandbox/jquery/easing/
@@ -85,10 +95,6 @@ function bounceOut(x: number) {
 	} else {
 		return n1 * (x -= (2.625 / d1)) * x + 0.984375;
 	}
-}
-
-export function none(x: number) {
-	return x === 0 ? 0 : 1;
 }
 
 export function swing(x: number) {
