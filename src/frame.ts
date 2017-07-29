@@ -9,5 +9,5 @@ export interface FrameVariables {
 
 export interface FrameVariable {
 	value: number;
-	easeNext: (x: number) => number;
+	easeNext: string | ((x: number) => number);
 }

@@ -3,8 +3,32 @@ import { Frame, FrameVariable, FrameVariables } from './frame';
 
 export class Sequence {
 
+	get length() {
+		return this.frames[this.frames.length - 1].time;
+	}
+
 	constructor(public frames: Frame[]) {
 
+	}
+
+	/**
+	 * Get an array of values of the sequence
+	 */
+
+	getArrayOfValues(interval: number, startTime = 0, endTime = -1) {
+		startTime = this.getActualTime(startTime);
+		endTime = this.getActualTime(endTime);
+
+		console.log('times', interval, startTime, endTime);
+
+		const values: Instance[] = [];
+		for (let time = startTime; time <= endTime; time += interval) {
+			values.push({
+				time,
+				values: this.getValuesAtTime(time)
+			});
+		}
+		return values;
 	}
 
 	/**
@@ -30,21 +54,21 @@ export class Sequence {
 		let previous: PreviousValue;
 
 		for (const frame of this.frames) {
-			const variable = frame.variables[variableName];
-			if (!variable) {
+			const frameVariable = frame.variables[variableName];
+			if (!frameVariable) {
 				continue;
 			}
 
 			if (frame.time < targetTime) {
 				previous = {
 					lastUpdated: frame.time,
-					value: variable.value,
-					easeNext: variable.easeNext
+					value: frameVariable.value,
+					easeNext: frameVariable.easeNext
 				};
 			}
 
 			if (frame.time === targetTime) {
-				return variable.value;
+				return frameVariable.value;
 			}
 
 			if (targetTime < frame.time) {
@@ -55,8 +79,18 @@ export class Sequence {
 				}
 
 				const timeDiff = frame.time - targetTime;
-				const valueDiff = variable.value - previous.value;
-				return (previous.easeNext(targetTime / timeDiff) * valueDiff) + previous.value;
+				const valueDiff = frameVariable.value - previous.value;
+
+				let easeFunction: (x: number) => number = easings.none;
+
+				if (typeof previous.easeNext === 'string' && (easings as any)[previous.easeNext])  {
+					easeFunction = (easings as any)[previous.easeNext];
+				}
+				if (typeof previous.easeNext === 'function') {
+					easeFunction = previous.easeNext;
+				}
+
+				return (easeFunction(targetTime / timeDiff) * valueDiff) + previous.value;
 			}
 		}
 	}
@@ -75,6 +109,17 @@ export class Sequence {
 			}
 		}
 		return uniqueNames;
+	}
+
+	/**
+	 * Normalize time of frame. If number is negative, it is time from the end.
+	 */
+
+	getActualTime(time: number) {
+		if (time < 0) {
+			time = this.length - 1 - time;
+		}
+		return time;
 	}
 
 }

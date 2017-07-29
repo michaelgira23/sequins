@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Sequence Inspector</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+		<link rel="stylesheet" href="/node_modules/jsoneditor/dist/jsoneditor.min.css"></script>
+
+		<style>
+			html, body, .inspector-container {
+				height: 100%;
+			}
+
+			.inspector-container {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.header,
+			.editor-container {
+				flex-grow: 0;
+				flex-shrink: 1;
+			}
+
+			.header {
+				padding: 0.5rem;
+				background-color: #3883fa;
+				color: #fff;
+			}
+
+			.chart-container {
+				width: 50%;
+				margin: 0 auto;
+				flex-grow: 1;
+				flex-shrink: 1;
+			}
+
+			.editor-container {
+				min-height: 40%;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="inspector-container">
+			<div class="header">
+				<h1 class="display-4">Sequence Inspector</h1>
+			</div>
+			<div class="chart-container">
+				<canvas id="chart"></canvas>
+			</div>
+			<div class="editor-container"></div>
+		</div>
+
+		<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+		<script src="/node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+		<script>
+			var $editor = $('.editor-container');
+			var editorOptions = {
+				mode: 'code',
+				indentation: 4,
+				onChange: parseEditorSequence
+			};
+			var editor = new JSONEditor($editor[0], editorOptions);
+
+			editor.set([
+				{
+					time: 0,
+					variables: {
+						x: {
+							value: 0,
+							easeNext: 'easeInOutCirc'
+						},
+						y: {
+							value: 50
+						}
+					}
+				},
+				{
+					time: 1000,
+					variables: {
+						x: {
+							value: 100,
+							easeNext: 'none'
+						},
+						y: {
+							value: 80
+						}
+					}
+				}
+			]);
+
+			var chartColors = [
+				[255, 99, 132],
+				[54, 162, 235],
+				[255, 206, 86],
+				[231, 233, 237],
+				[75, 192, 192],
+				[151, 187, 205],
+				[220, 220, 220],
+				[247, 70, 74],
+				[70, 191, 189],
+				[253, 180, 92],
+				[148, 159, 177],
+				[77, 83, 96]
+			];
+
+			var $chart = $('#chart');
+			var ctx = $chart[0].getContext('2d');
+			var chart = new Chart(ctx, {
+				type: 'scatter',
+				data: {
+					options: {
+						cubicInterpolationMode: 'monotone'
+					}
+				}
+			});
+
+			parseEditorSequence();
+
+			function parseEditorSequence() {
+				const json = editor.get();
+				console.log('change', json);
+				fetch('/sequence', {
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					method: 'POST',
+					body: JSON.stringify(json)
+				})
+					.then(res => res.json())
+					.then(updateChart)
+					.catch(err => {
+						console.log('Get Sequence Error!', err);
+					});
+			}
+
+			function updateChart({ unique, array }) {
+				console.log('update chart', unique, array);
+				var datasets = [];
+
+				var nthColor = 0;
+				for (var variableName of unique) {
+					var color = chartColors[nthColor++ % chartColors.length];
+					datasets.push({
+						label: variableName,
+						data: [],
+						backgroundColor: 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', 0.5)',
+						// cubicInterpolationMode: 'monotone'
+					});
+				}
+
+				for (var instance of array) {
+					for (var dataset of datasets) {
+						if (instance.values[dataset.label]) {
+							dataset.data.push({
+								x: instance.time,
+								y: instance.values[dataset.label]
+							});
+						}
+					}
+				}
+
+				console.log('datasets', datasets);
+
+				chart.data.datasets = datasets;
+				chart.update();
+			}
+		</script>
+	</body>
+</html>
