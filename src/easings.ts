@@ -7,7 +7,11 @@ export function none(x: number) {
 }
 
 export function split(x: number) {
-	return x < 5 ? 0 : 1;
+	return x < 0.5 ? 0 : 1;
+}
+
+export function linear(x: number) {
+	return x;
 }
 
 /**

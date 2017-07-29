@@ -19,8 +19,6 @@ export class Sequence {
 		startTime = this.getActualTime(startTime);
 		endTime = this.getActualTime(endTime);
 
-		console.log('times', interval, startTime, endTime);
-
 		const values: Instance[] = [];
 		for (let time = startTime; time <= endTime; time += interval) {
 			values.push({
@@ -78,7 +76,7 @@ export class Sequence {
 					return;
 				}
 
-				const timeDiff = frame.time - targetTime;
+				const easePercentage = (targetTime - previous.lastUpdated) / (frame.time - previous.lastUpdated);
 				const valueDiff = frameVariable.value - previous.value;
 
 				let easeFunction: (x: number) => number = easings.none;
@@ -90,7 +88,7 @@ export class Sequence {
 					easeFunction = previous.easeNext;
 				}
 
-				return (easeFunction(targetTime / timeDiff) * valueDiff) + previous.value;
+				return (easeFunction(easePercentage) * valueDiff) + previous.value;
 			}
 		}
 	}

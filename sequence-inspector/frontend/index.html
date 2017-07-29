@@ -75,7 +75,17 @@
 							easeNext: 'easeInOutCirc'
 						},
 						y: {
-							value: 50
+							value: 50,
+							easeNext: 'easeInOutElastic'
+						}
+					}
+				},
+				{
+					time: 500,
+					variables: {
+						y: {
+							value: 80,
+							easeNext: 'easeInQuart'
 						}
 					}
 				},
@@ -84,10 +94,9 @@
 					variables: {
 						x: {
 							value: 100,
-							easeNext: 'none'
 						},
 						y: {
-							value: 80
+							value: 20
 						}
 					}
 				}
@@ -113,9 +122,7 @@
 			var chart = new Chart(ctx, {
 				type: 'scatter',
 				data: {
-					options: {
-						cubicInterpolationMode: 'monotone'
-					}
+					options: {}
 				}
 			});
 
@@ -123,7 +130,6 @@
 
 			function parseEditorSequence() {
 				const json = editor.get();
-				console.log('change', json);
 				fetch('/sequence', {
 					headers: {
 						'Accept': 'application/json',
@@ -140,7 +146,6 @@
 			}
 
 			function updateChart({ unique, array }) {
-				console.log('update chart', unique, array);
 				var datasets = [];
 
 				var nthColor = 0;
@@ -164,8 +169,6 @@
 						}
 					}
 				}
-
-				console.log('datasets', datasets);
 
 				chart.data.datasets = datasets;
 				chart.update();
