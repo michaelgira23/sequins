@@ -18,7 +18,7 @@ app.post('/sequence', (req, res) => {
 	const sequence = new Sequence(req.body);
 	res.json({
 		unique: sequence.getUniqueVariables(),
-		array: sequence.getArrayOfValues(1)
+		array: sequence.exportArray(1)
 	});
 });
 
